@@ -13,5 +13,6 @@ app to help you make a meal
 3. Run `npm install` to install dependencies.
 4. Create .env file and complete the file following the .env.example file
 5. Check database connection 
-6. Run `tsc` command in root folder
-7. Go to dist folder and then run "app.js" file with `node dist/app.js` command. 
+6. Run `npx prisma db push` to seed db
+7. Run `tsc` command in root folder
+8. Go to dist folder and then run "app.js" file with `node dist/app.js` command. 
