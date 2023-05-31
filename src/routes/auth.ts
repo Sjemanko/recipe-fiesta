@@ -1,8 +1,9 @@
-import { Router } from "express";
-import testFunc from "../controllers/auth";
+import express from "express";
+import createAccount from "../controllers/auth";
 
-const router = Router();
+const router = express();
 
-router.get("/", testFunc);
+router.post("/", createAccount);
+
 
 export default router;
