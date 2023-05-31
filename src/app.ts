@@ -12,8 +12,9 @@ const PORT: number = parseInt(process.env.PORT!, 10) || 3000;
 
 app.use(bodyParser.json());
 
-app.use(authRouter);
+app.use("/account", authRouter);
 
+// error middleware
 
 app.listen(PORT, (): void => {
   console.log(`SERVER IS LISTENING ON PORT ${PORT}`);
