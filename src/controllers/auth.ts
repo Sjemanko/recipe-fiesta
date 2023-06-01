@@ -5,7 +5,7 @@ import ProjectError from "../helper/error";
 
 const prisma = new PrismaClient();
 
-const CreateAccount = async (
+export const createAccount = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -13,8 +13,8 @@ const CreateAccount = async (
   const email: string = req.body.email;
   const username: string = req.body.username;
   const password: string = req.body.password;
-
   const hashedPassword = await hash(password, 12);
+
   try {
     const user = await prisma.user.create({
       data: {
@@ -23,17 +23,18 @@ const CreateAccount = async (
         password: hashedPassword,
       },
     });
-    res.status(201).json({ message: "User Created", user: user });
+    return res.status(201).json({
+      message: "User Created!",
+    });
   } catch (err) {
-    if(err instanceof Prisma.PrismaClientKnownRequestError) {
-      if(err.code === 'P2002') {
-        console.log(
-          'There is a unique constraint violation, a new user cannot be created with this email'
-        )
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      if (err.code === "P2002") {
+        const error = new ProjectError(
+          `User with this ${err.meta?.target} already exists!`,
+          400
+        );
+        return next(error);
       }
     }
-    res.status(400).json({message: "nie wejdziesz makaroniarzu bez kraka"})
   }
 };
-
-export default CreateAccount;
