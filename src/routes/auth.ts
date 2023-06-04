@@ -1,12 +1,13 @@
 import express from "express";
-import { createAccount } from "../controllers/auth";
+import { postLogin, postSignup } from "../controllers/auth";
 import {
   validate,
-  signupValidationRules,
+  authValidationRules,
 } from "../helper/validation/authValidation";
 
 const router = express();
 
-router.post("/create", signupValidationRules(), validate, createAccount);
+router.post("/create", authValidationRules(), validate, postSignup);
+router.post("/login", postLogin);
 
 export default router;
