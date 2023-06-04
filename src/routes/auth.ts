@@ -1,8 +1,13 @@
-import { Router } from "express";
-import testFunc from "../controllers/auth";
+import express from "express";
+import { postLogin, postSignup } from "../controllers/auth";
+import {
+  validate,
+  authValidationRules,
+} from "../helper/validation/authValidation";
 
-const router = Router();
+const router = express();
 
-router.get("/", testFunc);
+router.post("/create", authValidationRules(), validate, postSignup);
+router.post("/login", postLogin);
 
 export default router;
