@@ -4,10 +4,11 @@ import {
   validate,
   authValidationRules,
 } from "../helper/validation/authValidation";
+import { API_PATHS } from "../common/apiPaths";
 
 const router = express();
 
-router.post("/create", authValidationRules(), validate, postSignup);
-router.post("/login", postLogin);
+router.post(API_PATHS.ACCOUNT.CREATE, authValidationRules, validate, postSignup);
+router.post(API_PATHS.ACCOUNT.LOGIN, postLogin);
 
 export default router;

@@ -1,10 +1,10 @@
-export interface SignupUserData {
+interface SignupUserData {
   email: string;
   username: string;
   password: string;
 }
 
-export interface LoginUserData {
+interface LoginUserData {
   email: string;
   password: string;
 }

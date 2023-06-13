@@ -1,14 +1,10 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
-import { compare, hash } from "bcrypt";
-import ProjectError from "../helper/error";
-import { LoginUserData, SignupUserData } from "../common/types";
-import { sign } from "jsonwebtoken";
-import * as dotenv from "dotenv";
-
-dotenv.config();
-
-const prisma = new PrismaClient();
+import bcrypt from "bcrypt";
+import ApiError from "../helper/error";
+import jwt from "jsonwebtoken";
+import { HTTP_CODES } from "../common/httpCodes";
+import { prisma } from "../config/prisma";
 
 export const postSignup = async (
   req: Request,
@@ -16,25 +12,26 @@ export const postSignup = async (
   next: NextFunction
 ) => {
   const { email, username, password }: SignupUserData = req.body;
-  const hashedPassword = await hash(password, 12);
+  const hashedPassword = await bcrypt.hash(password, process.env.SALT!);
 
   try {
     const user = await prisma.user.create({
       data: {
-        email: email,
-        username: username,
+        email,
+        username,
         password: hashedPassword,
       },
     });
-    return res.status(201).json({
+    return res.status(HTTP_CODES.SUCCESS.CREATED).json({
       message: "User Created!",
+      id: user.id,
     });
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError) {
       if (err.code === "P2002") {
-        const error = new ProjectError(
+        const error = new ApiError(
           `User with this ${err.meta?.target} already exists!`,
-          400
+          HTTP_CODES.FAILED.BAD_REQUEST
         );
         return next(error);
       }
@@ -51,21 +48,21 @@ export const postLogin = async (
   try {
     const user = await prisma.user.findFirst({
       where: {
-        email: email,
+        email,
       },
     });
     if (!user) {
-      throw new ProjectError(`Invalid Email!`, 401);
+      throw new ApiError(`Invalid Email!`, HTTP_CODES.FAILED.UNAUTHROZIED);
     }
-    const validationResult = await compare(password, user.password);
+    const validationResult = await bcrypt.compare(password, user.password);
     if (validationResult) {
-      const accessToken: string = sign(
+      const accessToken: string = jwt.sign(
         { id: user.id, username: user.username },
         process.env.SECRET!
       );
       return res.status(200).json({ accessToken: accessToken });
     } else {
-      throw new ProjectError(`Invalid Password!`, 401);
+      throw new ApiError(`Invalid Password!`, HTTP_CODES.FAILED.UNAUTHROZIED);
     }
   } catch (err) {
     return next(err);

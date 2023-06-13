@@ -1,4 +1,7 @@
-export default class ProjectError extends Error {
+export default class ApiError extends Error {
+  status: number = 0;
+  data: object | undefined;
+
   constructor(message: string, status: number, data?: object) {
     super(message);
     this.status = status;
@@ -6,6 +9,4 @@ export default class ProjectError extends Error {
       this.data = data;
     }
   }
-  status: number = 0;
-  data: object | undefined;
 }
